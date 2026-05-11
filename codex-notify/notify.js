@@ -24,6 +24,7 @@ const DEFAULT_CONFIG = {
   sound: {
     enabled: false,
     mode: "system",
+    nameAsTitle: false,
   },
 };
 
@@ -69,6 +70,7 @@ function loadConfig() {
     );
     merged.sound.enabled = Boolean(merged.sound.enabled);
     merged.sound.mode = merged.sound.mode === "file" ? "file" : "system";
+    merged.sound.nameAsTitle = Boolean(merged.sound.nameAsTitle);
     return merged;
   } catch (error) {
     console.error(
@@ -114,6 +116,11 @@ function truncate(text, limit) {
     return text;
   }
   return `${text.slice(0, Math.max(0, limit - 1))}…`;
+}
+
+function buildSoundTitle(filePath) {
+  const filename = path.basename(filePath, path.extname(filePath)).trim();
+  return filename ? `Codex: ${truncate(filename, 80)}` : "Codex: Turn Complete";
 }
 
 // 生成通知标题
@@ -272,14 +279,20 @@ function chooseSoundFile(filePaths) {
 // 播放系统提示音
 function playSystemSound() {
   if (commandExists("canberra-gtk-play")) {
-    return runCommand("canberra-gtk-play", [
+    const result = runCommand("canberra-gtk-play", [
       "--id",
       "complete",
       "--description",
       "Codex",
     ]);
+    return { ...result, soundFilePath: "" };
   }
-  return { ok: false, skipped: true, message: "canberra-gtk-play not found" };
+  return {
+    ok: false,
+    skipped: true,
+    message: "canberra-gtk-play not found",
+    soundFilePath: "",
+  };
 }
 
 // 播放自定义音频
@@ -287,24 +300,28 @@ function playCustomSound(filePath) {
   const ext = path.extname(filePath).toLowerCase();
 
   if (commandExists("pw-play")) {
-    return runCommand("pw-play", [filePath]);
+    const result = runCommand("pw-play", [filePath]);
+    return { ...result, soundFilePath: filePath };
   }
   if (commandExists("ffplay")) {
-    return runCommand("ffplay", [
+    const result = runCommand("ffplay", [
       "-v",
       "error",
       "-nodisp",
       "-autoexit",
       filePath,
     ]);
+    return { ...result, soundFilePath: filePath };
   }
   if (ext === ".wav" && commandExists("aplay")) {
-    return runCommand("aplay", [filePath]);
+    const result = runCommand("aplay", [filePath]);
+    return { ...result, soundFilePath: filePath };
   }
   return {
     ok: false,
     skipped: true,
     message: "no supported audio player found for custom sound",
+    soundFilePath: filePath,
   };
 }
 
@@ -367,9 +384,15 @@ function main() {
   }
 
   const config = loadConfig();
-  const title = buildTitle(notification);
   const body = buildBody(notification);
   const threadId = String(notification["thread-id"] || "");
+
+  // 声音结果先算出来，允许用选中的音乐文件名覆盖通知标题。
+  const soundResult = playSound(config);
+  const title =
+    config.sound.nameAsTitle && soundResult.soundFilePath
+      ? buildSoundTitle(soundResult.soundFilePath)
+      : buildTitle(notification);
 
   // 收集弹窗结果
   const popupResults = [];
@@ -380,8 +403,6 @@ function main() {
     popupResults.push(sendDesktopDialog(title, body, config));
   }
 
-  // 声音结果单独处理
-  const soundResult = playSound(config);
   const results = [...popupResults];
   if (!soundResult.skipped || !soundResult.ok) {
     results.push(soundResult);

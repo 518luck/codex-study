@@ -11,6 +11,7 @@
   },
   "sound": {
     "enabled": true,
-    "mode": "file"
+    "mode": "file",
+    "nameAsTitle": false
   }
 }

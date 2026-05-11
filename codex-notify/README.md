@@ -62,7 +62,8 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   },
   "sound": {
     "enabled": false,
-    "mode": "system"
+    "mode": "system",
+    "nameAsTitle": false
   }
 }
 ```
@@ -161,7 +162,8 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
 ```json
 "sound": {
   "enabled": true,
-  "mode": "system"
+  "mode": "system",
+  "nameAsTitle": false
 }
 ```
 
@@ -175,6 +177,19 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
 
 - `"system"`：播放系统提示音
 - `"file"`：优先扫描 `music/` 目录并播放其中的本地音频文件；如果 `music/` 里没有可用文件，也会自动回退到系统提示音，不报错
+
+### `sound.nameAsTitle`
+
+- 类型：`boolean`
+- 默认值：`false`
+- 作用：是否把通知标题改成当前播放的音乐文件名，并自动去掉后缀
+
+例如：
+
+- 文件名是 `下班啦.mp3`
+- 开启后通知标题会显示为 `Codex: 下班啦`
+
+如果当前没有用到 `music/` 目录里的文件，而是回退到系统提示音，那么仍然会使用正常的 Codex 回复标题。
 
 ### `music/` 目录
 
@@ -191,7 +206,8 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
 ```json
 "sound": {
   "enabled": true,
-  "mode": "file"
+  "mode": "file",
+  "nameAsTitle": false
 }
 ```
 
@@ -214,7 +230,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   "sound": {
     "enabled": false,
     "mode": "system",
-    "filePath": ""
+    "nameAsTitle": false
   }
 }
 ```
@@ -236,7 +252,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   "sound": {
     "enabled": false,
     "mode": "system",
-    "filePath": ""
+    "nameAsTitle": false
   }
 }
 ```
@@ -258,7 +274,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   "sound": {
     "enabled": false,
     "mode": "system",
-    "filePath": ""
+    "nameAsTitle": false
   }
 }
 ```
@@ -280,7 +296,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   "sound": {
     "enabled": true,
     "mode": "system",
-    "filePath": ""
+    "nameAsTitle": false
   }
 }
 ```
@@ -302,7 +318,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   "sound": {
     "enabled": true,
     "mode": "system",
-    "filePath": ""
+    "nameAsTitle": false
   }
 }
 ```
@@ -324,7 +340,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   "sound": {
     "enabled": true,
     "mode": "file",
-    "filePath": "/home/duoyun/Music/notify.wav"
+    "nameAsTitle": true
   }
 }
 ```
@@ -351,7 +367,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
 
 ## 注意事项
 
-- `sound.mode = "file"` 时，`filePath` 不能为空
-- 自定义音频文件必须存在，并且当前用户可读
+- `sound.mode = "file"` 时，脚本会自动扫描 `music/` 目录
+- `sound.nameAsTitle = true` 只会在实际播放 `music/` 目录里的文件时生效
 - `aplay` 主要适合 `.wav` 文件
 - `notify-send` 和 `zenity` 是否可用，取决于你的桌面环境和系统安装情况

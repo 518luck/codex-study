@@ -77,8 +77,7 @@ file_opener = "vscode"
 # 【外部通知脚本】
 # 备选项: 包含执行程序和路径的数组，如 ["python3", "/path/to/notify.py"]
 # 大白话: AI 跑完长耗时任务后，要不要触发个外部脚本（比如发个桌面弹窗或钉钉消息）叫你。（此处保持注释）
-# notify = ["python3", "/path/to/notify.py"]
-
+notify = ["node", "/home/duoyun/idea/idea/codex-notify/codex-notify/notify.js"]
 
 # ------------------------------------------
 # 4. 操作系统专属设置 (OS Specific)

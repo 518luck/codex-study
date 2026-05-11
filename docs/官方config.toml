@@ -349,7 +349,7 @@ show_tooltips = true
 # 使用 [] 可以解绑某个动作。
 # [tui.keymap.global]
 # open_transcript = "ctrl-t"
-# open_external_editor = []
+# open_external_editor = [] 
 #
 # [tui.keymap.composer]
 # submit = ["enter", "ctrl-m"]

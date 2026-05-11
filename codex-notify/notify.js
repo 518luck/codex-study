@@ -7,7 +7,6 @@ const { spawnSync } = require("child_process");
 // 配置文件路径
 const CONFIG_PATH = path.join(__dirname, "config.json");
 const SOUND_STATE_PATH = path.join(__dirname, ".sound-state.json");
-const LOG_PATH = path.join(__dirname, "notify.log");
 const MUSIC_DIR = path.join(__dirname, "music");
 // 默认配置
 const DEFAULT_CONFIG = {
@@ -233,10 +232,6 @@ function saveSoundState(state) {
   fs.writeFileSync(SOUND_STATE_PATH, `${JSON.stringify(state, null, 2)}\n`);
 }
 
-function appendLog(entry) {
-  fs.appendFileSync(LOG_PATH, `${JSON.stringify(entry)}\n`, "utf8");
-}
-
 function buildSoundKey(filePaths) {
   return [...filePaths].sort().join("\n");
 }
@@ -262,8 +257,9 @@ function chooseSoundFile(filePaths) {
   const eligible = filePaths.filter((filePath) => cycleState[filePath] !== 1);
 
   // 播放完一轮后重置衰减，让每个文件重新回到高概率池。
-  const activePaths = eligible.length > 0 ? eligible : filePaths;
-  const activeState = eligible.length > 0 ? cycleState : {};
+  const isNewCycle = eligible.length === 0;
+  const activePaths = isNewCycle ? filePaths : eligible;
+  const activeState = isNewCycle ? {} : cycleState;
   const weightedEntries = activePaths.map((filePath) => ({
     filePath,
     weight: activeState[filePath] === 1 ? 1 : 4,
@@ -271,8 +267,12 @@ function chooseSoundFile(filePaths) {
   const selected = pickWeightedRandom(weightedEntries).filePath;
   const nextCycleState = { ...activeState, [selected]: 1 };
 
-  state[soundKey] = nextCycleState;
-  saveSoundState(state);
+  if (isNewCycle) {
+    saveSoundState({ [soundKey]: nextCycleState });
+  } else {
+    state[soundKey] = nextCycleState;
+    saveSoundState(state);
+  }
   return selected;
 }
 
@@ -349,11 +349,6 @@ function playSound(config) {
 function main() {
   if (process.argv.length !== 3) {
     console.error("usage: notify.js '<json payload>'");
-    appendLog({
-      timestamp: new Date().toISOString(),
-      type: "invalid-usage",
-      argv: process.argv.slice(2),
-    });
     return 1;
   }
 
@@ -363,21 +358,8 @@ function main() {
     notification = JSON.parse(rawPayload);
   } catch (error) {
     console.error(`invalid JSON payload: ${error.message}`);
-    appendLog({
-      timestamp: new Date().toISOString(),
-      type: "invalid-json",
-      error: error.message,
-      rawPayload,
-    });
     return 1;
   }
-
-  appendLog({
-    timestamp: new Date().toISOString(),
-    type: "notification",
-    notificationType: String(notification.type || ""),
-    payload: notification,
-  });
 
   if (notification.type !== "agent-turn-complete") {
     return 0;

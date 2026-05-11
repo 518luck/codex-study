@@ -1,0 +1,3 @@
+{"timestamp":"2026-05-11T00:00:00.000Z","type":"log-initialized","message":"notify log created; future Codex payloads will be appended here"}
+{"timestamp":"2026-05-11T15:05:11.009Z","type":"notification","notificationType":"agent-turn-complete","payload":{"type":"agent-turn-complete","thread-id":"manual-test","turn-id":"manual-turn","cwd":"/tmp/codex-test","input-messages":["use music folder"],"last-assistant-message":"music dir test"}}
+{"test":true,"ts":"2026-05-11T15:05:23.569Z"}

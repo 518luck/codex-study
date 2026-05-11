@@ -6,6 +6,9 @@ const { spawnSync } = require("child_process");
 
 // 配置文件路径
 const CONFIG_PATH = path.join(__dirname, "config.json");
+const SOUND_STATE_PATH = path.join(__dirname, ".sound-state.json");
+const LOG_PATH = path.join(__dirname, "notify.log");
+const MUSIC_DIR = path.join(__dirname, "music");
 // 默认配置
 const DEFAULT_CONFIG = {
   popup: {
@@ -21,7 +24,6 @@ const DEFAULT_CONFIG = {
   sound: {
     enabled: false,
     mode: "system",
-    filePath: "",
   },
 };
 
@@ -67,8 +69,6 @@ function loadConfig() {
     );
     merged.sound.enabled = Boolean(merged.sound.enabled);
     merged.sound.mode = merged.sound.mode === "file" ? "file" : "system";
-    merged.sound.filePath =
-      typeof merged.sound.filePath === "string" ? merged.sound.filePath : "";
     return merged;
   } catch (error) {
     console.error(
@@ -192,17 +192,81 @@ function sendDesktopDialog(title, body, config) {
   ]);
 }
 
-// 解析自定义音频路径
-function resolveSoundFile(filePath) {
-  const resolvedPath = path.isAbsolute(filePath)
-    ? filePath
-    : path.join(__dirname, filePath);
-  const stats = fs.statSync(resolvedPath);
-  if (!stats.isFile()) {
-    throw new Error("sound.filePath is not a file");
+function listMusicFiles() {
+  try {
+    const entries = fs.readdirSync(MUSIC_DIR, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile())
+      .map((entry) => path.join(MUSIC_DIR, entry.name))
+      .filter((filePath) => {
+        try {
+          fs.accessSync(filePath, fs.constants.R_OK);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      })
+      .sort();
+  } catch (error) {
+    return [];
   }
-  fs.accessSync(resolvedPath, fs.constants.R_OK);
-  return resolvedPath;
+}
+
+function loadSoundState() {
+  try {
+    const raw = fs.readFileSync(SOUND_STATE_PATH, "utf8");
+    const parsed = JSON.parse(raw);
+    return isPlainObject(parsed) ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveSoundState(state) {
+  fs.writeFileSync(SOUND_STATE_PATH, `${JSON.stringify(state, null, 2)}\n`);
+}
+
+function appendLog(entry) {
+  fs.appendFileSync(LOG_PATH, `${JSON.stringify(entry)}\n`, "utf8");
+}
+
+function buildSoundKey(filePaths) {
+  return [...filePaths].sort().join("\n");
+}
+
+function pickWeightedRandom(entries) {
+  const totalWeight = entries.reduce((sum, entry) => sum + entry.weight, 0);
+  let cursor = Math.random() * totalWeight;
+
+  for (const entry of entries) {
+    cursor -= entry.weight;
+    if (cursor <= 0) {
+      return entry;
+    }
+  }
+
+  return entries[entries.length - 1];
+}
+
+function chooseSoundFile(filePaths) {
+  const soundKey = buildSoundKey(filePaths);
+  const state = loadSoundState();
+  const cycleState = isPlainObject(state[soundKey]) ? state[soundKey] : {};
+  const eligible = filePaths.filter((filePath) => cycleState[filePath] !== 1);
+
+  // 播放完一轮后重置衰减，让每个文件重新回到高概率池。
+  const activePaths = eligible.length > 0 ? eligible : filePaths;
+  const activeState = eligible.length > 0 ? cycleState : {};
+  const weightedEntries = activePaths.map((filePath) => ({
+    filePath,
+    weight: activeState[filePath] === 1 ? 1 : 4,
+  }));
+  const selected = pickWeightedRandom(weightedEntries).filePath;
+  const nextCycleState = { ...activeState, [selected]: 1 };
+
+  state[soundKey] = nextCycleState;
+  saveSoundState(state);
+  return selected;
 }
 
 // 播放系统提示音
@@ -220,11 +284,10 @@ function playSystemSound() {
 
 // 播放自定义音频
 function playCustomSound(filePath) {
-  const resolvedPath = resolveSoundFile(filePath);
-  const ext = path.extname(resolvedPath).toLowerCase();
+  const ext = path.extname(filePath).toLowerCase();
 
   if (commandExists("pw-play")) {
-    return runCommand("pw-play", [resolvedPath]);
+    return runCommand("pw-play", [filePath]);
   }
   if (commandExists("ffplay")) {
     return runCommand("ffplay", [
@@ -232,11 +295,11 @@ function playCustomSound(filePath) {
       "error",
       "-nodisp",
       "-autoexit",
-      resolvedPath,
+      filePath,
     ]);
   }
   if (ext === ".wav" && commandExists("aplay")) {
-    return runCommand("aplay", [resolvedPath]);
+    return runCommand("aplay", [filePath]);
   }
   return {
     ok: false,
@@ -253,10 +316,11 @@ function playSound(config) {
 
   try {
     if (config.sound.mode === "file") {
-      if (!config.sound.filePath.trim()) {
-        return { ok: false, skipped: true, message: "sound.filePath is empty" };
+      const musicFiles = listMusicFiles();
+      if (musicFiles.length > 0) {
+        return playCustomSound(chooseSoundFile(musicFiles));
       }
-      return playCustomSound(config.sound.filePath.trim());
+      return playSystemSound();
     }
     return playSystemSound();
   } catch (error) {
@@ -268,16 +332,35 @@ function playSound(config) {
 function main() {
   if (process.argv.length !== 3) {
     console.error("usage: notify.js '<json payload>'");
+    appendLog({
+      timestamp: new Date().toISOString(),
+      type: "invalid-usage",
+      argv: process.argv.slice(2),
+    });
     return 1;
   }
 
+  const rawPayload = process.argv[2];
   let notification;
   try {
-    notification = JSON.parse(process.argv[2]);
+    notification = JSON.parse(rawPayload);
   } catch (error) {
     console.error(`invalid JSON payload: ${error.message}`);
+    appendLog({
+      timestamp: new Date().toISOString(),
+      type: "invalid-json",
+      error: error.message,
+      rawPayload,
+    });
     return 1;
   }
+
+  appendLog({
+    timestamp: new Date().toISOString(),
+    type: "notification",
+    notificationType: String(notification.type || ""),
+    payload: notification,
+  });
 
   if (notification.type !== "agent-turn-complete") {
     return 0;

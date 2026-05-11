@@ -62,8 +62,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
   },
   "sound": {
     "enabled": false,
-    "mode": "system",
-    "filePath": ""
+    "mode": "system"
   }
 }
 ```
@@ -162,8 +161,7 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
 ```json
 "sound": {
   "enabled": true,
-  "mode": "system",
-  "filePath": ""
+  "mode": "system"
 }
 ```
 
@@ -176,33 +174,24 @@ NODE_BIN="/home/duoyun/.nvm/versions/node/v24.14.0/bin/node" bash ./test-notify.
 含义：
 
 - `"system"`：播放系统提示音
-- `"file"`：播放你指定的本地音频文件
+- `"file"`：优先扫描 `music/` 目录并播放其中的本地音频文件；如果 `music/` 里没有可用文件，也会自动回退到系统提示音，不报错
 
-### `sound.filePath`
+### `music/` 目录
 
-- 类型：`string`
-- 作用：自定义音频文件路径
-- 默认值：`""`
+把音频文件直接放到 `codex-notify/music/` 下面即可，不需要在 `config.json` 里逐个写路径。
 
-只有当 `sound.mode` 为 `"file"` 时才会使用这个字段。
+脚本会：
 
-可以写绝对路径：
+- 扫描 `music/` 目录下所有可读文件
+- 有文件时按“整轮内尽量不重复”的规则随机播放
+- 没有文件时，即使 `sound.mode = "file"` 也会自动使用系统提示音
 
-```json
-"sound": {
-  "enabled": true,
-  "mode": "file",
-  "filePath": "/home/duoyun/Music/notify.wav"
-}
-```
-
-也可以写相对路径。相对路径会以 `config.json` 所在目录为基准：
+示例配置：
 
 ```json
 "sound": {
   "enabled": true,
-  "mode": "file",
-  "filePath": "./sounds/notify.wav"
+  "mode": "file"
 }
 ```
 

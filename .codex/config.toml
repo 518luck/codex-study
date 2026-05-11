@@ -13,7 +13,7 @@
 model = "gpt-5.4"
 
 # 【模型推理算力/思考深度】(针对 o 系列等模型)
-# 备选项: "low" (低), "medium" (中), "high" (高)
+# 推理力度：minimal（极小） | low（低） | medium（中等） | high（高） | xhigh（极高）
 # 大白话: 遇到难题时，让 AI 挠破头皮想多久。选 high 思考得最深、最准，但也最慢。
 model_reasoning_effort = "medium"
 
@@ -27,25 +27,22 @@ personality = "pragmatic"
 # 大白话: AI 遇到不懂的能不能自己上网搜。live 是现搜现学；cached 是查官方整理好的安全题库，防网页投毒。
 web_search = "live" 
 
-# 【强制推理解析摘要】
-# 备选项: true, false
-# 大白话: 强制告诉系统，当前这个模型支不支持对长篇思考过程进行精简总结。
-model_supports_reasoning_summaries = true 
 
 # 【推理解析摘要模式】
 # 备选项: "none" (禁用摘要), 或其他系统级支持的摘要参数
 # 大白话: 要不要把 AI 脑子里的长篇大论总结成一句话告诉你。选 none 就是不总结，直接看结果。
+# 推理摘要：auto（自动） | concise（简明） | detailed（详细） | none（无）
 model_reasoning_summary = "none" 
 
 # 【模型话痨程度】
-# 备选项: "low" (低), "high" (高)
+# GPT-5 系列模型（Responses API）的文本冗长程度：low（低） | medium（中等） | high（高）
 # 大白话: AI 是个话痨还是个闷葫芦。low 意味着能用一行字说完绝不写两行，极致精简。
 model_verbosity = "low" 
 
 # 【模型上下文窗口限制】
-# 备选项: 128000, 8192 等整数 (具体取决于模型本身的上限)
+#  tokens；默认：根据模型自动推断
 # 大白话: AI 的内存条大小。数字越大，它能同时记住的历史聊天记录和读取的文件就越多。
-model_context_window = 128000 
+# model_context_window = 258000 
 
 
 # ------------------------------------------ 
@@ -90,6 +87,7 @@ file_opener = "vscode"
 
 # ------------------------------------------
 # 4. 操作系统专属设置 (OS Specific)
+# windows需要特殊配置一下,我这个不一定对
 # ------------------------------------------
 
 [windows]

@@ -25,19 +25,19 @@ personality = "pragmatic"
 # 【网络搜索模式】
 # 备选项: "cached" (缓存题库), "live" (实时搜索), "disabled" (禁止联网)
 # 大白话: AI 遇到不懂的能不能自己上网搜。live 是现搜现学；cached 是查官方整理好的安全题库，防网页投毒。
-web_search = "live" 
+web_search = "live"
 
 
 # 【推理解析摘要模式】
 # 备选项: "none" (禁用摘要), 或其他系统级支持的摘要参数
 # 大白话: 要不要把 AI 脑子里的长篇大论总结成一句话告诉你。选 none 就是不总结，直接看结果。
 # 推理摘要：auto（自动） | concise（简明） | detailed（详细） | none（无）
-model_reasoning_summary = "none" 
+model_reasoning_summary = "none"
 
 # 【模型话痨程度】
 # GPT-5 系列模型（Responses API）的文本冗长程度：low（低） | medium（中等） | high（高）
 # 大白话: AI 是个话痨还是个闷葫芦。low 意味着能用一行字说完绝不写两行，极致精简。
-model_verbosity = "low" 
+model_verbosity = "low"
 
 # 【模型上下文窗口限制】
 #  tokens；默认：根据模型自动推断
@@ -72,12 +72,7 @@ default_permissions = ":workspace"
 # 【代码文件引用打开器】
 # 备选项: "vscode", "cursor", "windsurf", "vscode-insiders", "none"
 # 大白话: 当 AI 在终端里高亮某行代码时，你点那个链接，用哪个代码编辑器打开它。
-file_opener = "vscode" 
-
-# 【自定义系统日志存放目录】
-# 备选项: 任意你电脑上的绝对路径字符串
-# 大白话: AI 的工作日记（系统报错、运行日志）存在你电脑的哪个犄角旮旯。（此处保持注释）
-# log_dir = "/absolute/path/to/codex-logs"
+file_opener = "vscode"
 
 # 【外部通知脚本】
 # 备选项: 包含执行程序和路径的数组，如 ["python3", "/path/to/notify.py"]
@@ -86,37 +81,10 @@ file_opener = "vscode"
 
 
 # ------------------------------------------
-# 4. 操作系统专属设置 (OS Specific)
-# windows需要特殊配置一下,我这个不一定对
-# ------------------------------------------
-
-[windows]
-# 【Windows 原生沙盒模式】
-# 备选项: "elevated" (提权模式), "unelevated" (非提权模式)
-# 大白话: Windows 专属的安全隔离服。elevated 就是要管理员权限给它穿上最严密的防弹衣，最安全。
-sandbox = "elevated"
-
-
-# ------------------------------------------
-# 5. 终端执行环境 (Command Environment)
-# ------------------------------------------
-
-[shell_environment_policy]
-# 【环境变量传递白名单】
-# 备选项: 结合 inherit, set, exclude, include_only 使用的数组
-# 大白话: AI 偷偷在后台跑脚本时，只准它看到你电脑里的 PATH 和 HOME，严防它偷看你的 AWS 或云服务器密钥。
-include_only = ["PATH", "HOME"]
-
-
-# ------------------------------------------
 # 6. 功能开关 (Feature Flags)
 # ------------------------------------------
 
 [features]
-# 【第三方应用连接器】(实验性)
-# 备选项: true, false
-# 大白话: 能不能让 AI 接入第三方的应用插件系统。
-apps = false 
 
 # 【生命周期钩子机制】
 # 备选项: true, false
@@ -126,32 +94,7 @@ hooks = true
 # 【目标跟踪机制】(实验性)
 # 备选项: true, false
 # 大白话: 给 AI 立个 Flag。打开后可用 /goal 命令，让它在长篇大论干活中死盯目标，不忘初心。
-goals = false
-
-# 【记忆功能】
-# 备选项: true, false
-# 大白话: AI 的小本本。打开后它会跨对话记住你的代码习惯和踩过的坑，下次不用你再重复啰嗦。
-memories = true
-
-# 【多智能体并发协同】
-# 备选项: true, false
-# 大白话: 影分身之术。打开后，遇到复杂任务 AI 会分裂出多个小弟一起干活（注意：会成倍消耗你的 Token 额度！）。
-multi_agent = true
-
-# 【终端环境快照】
-# 备选项: true, false
-# 大白话: 终端环境的“存档”功能。有了它，AI 反复跑相似命令时不用每次都重新初始化，速度快得飞起。
-shell_snapshot = true
-
-# 【代码撤销功能】
-# 备选项: true, false
-# 大白话: 超级后悔药。打开后，AI 每轮对话都会打个 Git 幽灵快照，搞砸了可以一键撤销。
-undo = false
-
-# 【统一后台任务处理器】
-# 备选项: true, false
-# 大白话: 底层稳定性优化。能让 AI 帮你跑长时间任务（比如 npm install）时不会突然断开连接。
-unified_exec = true
+goals = true
 
 
 # ------------------------------------------
@@ -182,14 +125,12 @@ enabled = false
 submit = ["enter"]
 # 禁用示例：
 # submit = [] 
- 
+
 # 【编辑器快捷键】
 [tui.keymap.editor]
 # 备选项: 组合键字符串
 # 大白话: 这个区域管的是代码编辑或多行文本行为。把换行改成了 Shift+Enter，彻底解决和发送消息抢按键的冲突。
 insert_newline = ["shift-enter"]
-
-
 
 
 # ------------------------------------------
@@ -200,11 +141,11 @@ insert_newline = ["shift-enter"]
 # 底部状态栏显示的条目（按数组里的前后顺序排列显示）
 status_line = [
     "model-with-reasoning", # 显示模型名称及推理级别
-    "run-state",          # 显示 AI 运行状态（就绪/工作中/思考中）
-    "five-hour-limit" ,           # 显示 5 小时内剩余提问配额
+    "run-state",            # 显示 AI 运行状态（就绪/工作中/思考中）
+    "five-hour-limit",      # 显示 5 小时内剩余提问配额
     "context-used",         # 显示已用上下文窗口百分比
-    "weekly-limit"         # 显示每周剩余提问配额
-] 
+    "weekly-limit",         # 显示每周剩余提问配额
+]
 
 # 如果你也想顺手自定义一下顶部终端窗口的标题，可以用这个：
 # "app-name" (应用名称，通常就是显示 Codex)
@@ -216,6 +157,24 @@ status_line = [
 # "model" (当前使用的 AI 模型)
 # "task-progress" (多步任务的进度提示)
 terminal_title = [
-    "task-progress",              
-    "thread"
+    "app-name",
+    "project",
+    "spinner",
+    "status",
+    "thread",
+    "git branch",
+    "model",
+    "task-progress",
 ]
+
+
+# ------------------------------------------
+# 4. 操作系统专属设置 (OS Specific)
+# windows需要特殊配置一下,我这个不一定对
+# ------------------------------------------
+
+[windows]
+# 【Windows 原生沙盒模式】
+# 备选项: "elevated" (提权模式), "unelevated" (非提权模式)
+# 大白话: Windows 专属的安全隔离服。elevated 就是要管理员权限给它穿上最严密的防弹衣，最安全。
+sandbox = "elevated"

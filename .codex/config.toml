@@ -77,7 +77,10 @@ file_opener = "vscode"
 # 【外部通知脚本】
 # 备选项: 包含执行程序和路径的数组，如 ["python3", "/path/to/notify.py"]
 # 大白话: AI 跑完长耗时任务后，要不要触发个外部脚本（比如发个桌面弹窗或钉钉消息）叫你。（此处保持注释）
-notify = ["node", "/home/duoyun/idea/idea/codex-notify/codex-notify/notify.js"]
+# notify = [
+#     "node",
+#     "/home/duoyun/idea/configs/codex-study/codex-notify/notify.js",
+# ]
 
 # ------------------------------------------
 # 4. 操作系统专属设置 (OS Specific)
@@ -101,6 +104,9 @@ sandbox = "elevated"
 # 备选项: true, false
 # 大白话: 自动化流水线开关。打开后，AI 改代码前后会自动触发你设定的脚本（比如改完自动跑一下 ESLint）。
 hooks = true
+
+# 【是否开启极速模式】
+fast_mode = false
 
 # 【目标跟踪机制】(实验性)
 # 备选项: true, false
@@ -163,21 +169,21 @@ terminal_title = [
 # ------------------------------------------
 
 # 【全局快捷键】
-[tui.keymap.global]
-# 备选项: 组合键字符串如 "ctrl-t", "ctrl-a" 等。传入空数组 [] 表示禁用该快捷键。
-# 大白话: 全局生效的快捷键，不管光标在哪按了都有用。（此处保持注释）
-# open_transcript = "ctrl-t"
+# [tui.keymap.global]
+# # 备选项: 组合键字符串如 "ctrl-t", "ctrl-a" 等。传入空数组 [] 表示禁用该快捷键。
+# # 大白话: 全局生效的快捷键，不管光标在哪按了都有用。（此处保持注释）
+# # open_transcript = "ctrl-t"
 
 # 【输入框快捷键】
-[tui.keymap.composer]
-# 备选项: "enter", "shift-enter", "ctrl-m" 等组合
-# 大白话: 这个区域专门管你底下打字聊天的输入框。设为 enter 意味着回车键纯粹用来发消息。
-submit = ["enter"]
-# 禁用示例：
-# submit = [] 
+# [tui.keymap.composer]
+# # 备选项: "enter", "shift-enter", "ctrl-m" 等组合
+# # 大白话: 这个区域专门管你底下打字聊天的输入框。设为 enter 意味着回车键纯粹用来发消息。
+# submit = ["ctrl-enter"]
+# # 禁用示例：
+# # submit = [] 
 
-# 【编辑器快捷键】
-[tui.keymap.editor]
-# 备选项: 组合键字符串
-# 大白话: 这个区域管的是代码编辑或多行文本行为。把换行改成了 Shift+Enter，彻底解决和发送消息抢按键的冲突。
-insert_newline = ["shift-enter"]
+# # 【编辑器快捷键】
+# [tui.keymap.editor]
+# # 备选项: 组合键字符串
+# # 大白话: 这个区域管的是代码编辑或多行文本行为。把换行改成了 Shift+Enter，彻底解决和发送消息抢按键的冲突。
+# insert_newline = ["shift-enter"]

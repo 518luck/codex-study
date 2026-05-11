@@ -1,0 +1,17 @@
+{
+  "popup": {
+    "system": {
+      "enabled": true,
+      "expireTimeMs": 10000
+    },
+    "desktop": {
+      "enabled": false,
+      "timeoutMs": 15000
+    }
+  },
+  "sound": {
+    "enabled": true,
+    "mode": "file",
+    "filePath": "/home/duoyun/idea/idea/codex-notify/codex-notify/freesound_community-01-risita-nina-98842.mp3"
+  }
+}

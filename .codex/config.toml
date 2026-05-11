@@ -129,8 +129,12 @@ status_line = [
     "model-with-reasoning", # 显示模型名称及推理级别
     "run-state",            # 显示 AI 运行状态（就绪/工作中/思考中）
     "five-hour-limit",      # 显示 5 小时内剩余提问配额
-    "context-used",         # 显示已用上下文窗口百分比
+    "context-used",         # 显示已用上下文窗口百分比 
     "weekly-limit",         # 显示每周剩余提问配额
+    "fast-mode",            # 显示是否为极速模式 
+    "used-tokens",          # 显示本轮对话消耗的总 Token 数
+    "total-input-tokens",   #统计输入消耗的 Token 数
+    "total-output-tokens",  #统计输出消耗的 Token 数
 ]
 
 # 如果你也想顺手自定义一下顶部终端窗口的标题，可以用这个：
